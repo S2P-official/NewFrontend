@@ -3,6 +3,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
+
+
+
 type Role = 'admin' | 'user';
 
 type User = {
@@ -34,6 +37,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
+
+  // const [user, setUser] = useState(null);
+const [loading, setLoading] = useState(true);
   // Load user from localStorage on client mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -41,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
+        setLoading(false);
     }
   }, []);
 
@@ -57,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await response.json();
+    console.log(data);
 
     setUser(data);
     localStorage.setItem('user', JSON.stringify(data));
@@ -83,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ firstName, lastName, email, phoneNumber, password, role }),
     });
 
+
     if (!response.ok) {
       const errorMsg = await response.text();
       throw new Error(errorMsg || 'Signup failed');
@@ -95,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    router.push('/login');
+    router.push('/signin');
   };
 
   return (
@@ -112,3 +121,5 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+

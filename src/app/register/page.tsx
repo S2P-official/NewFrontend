@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
+import { registerSchema, RegisterSchemaType } from '@/app/lib/validations';
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,27 +19,33 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+  setError('');
 
-    // Validate form fields
-    if (!firstName || !lastName || !email || !phoneNumber || !password || !confirmPassword) {
-      setError('All fields are required.');
-      return;
-    }
+  const result = registerSchema.safeParse({
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    password,
+    confirmPassword,
+  });
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+  if (!result.success) {
+  setError(result.error.issues[0].message);
 
-    try {
-      await signup(firstName, lastName, email, phoneNumber, password);
-      router.push('/'); // Redirect after successful signup
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Registration failed.');
-    }
-  };
+    return;
+  }
+
+  try {
+    await signup(firstName, lastName, email, phoneNumber, password);
+    router.push('/');
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || 'Registration failed.');
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

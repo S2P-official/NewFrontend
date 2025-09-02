@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-// import Image from 'next/image';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import { Star, Heart, ShoppingCart, Minus, Plus, Truck, Shield, RotateCcw, Check, Eye, ZoomIn } from 'lucide-react';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, Heart, ShoppingCart, Minus, Plus, Truck, Shield, RotateCcw, Check, Eye, ZoomIn } from 'lucide-react';
 
 import { Product } from '@/app/types';
 import { useCart } from '@/app/context/CartContext';

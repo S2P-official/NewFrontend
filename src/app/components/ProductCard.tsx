@@ -42,13 +42,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
     >
       <Link href={`/product/${product.id}`}>
         <div className="relative overflow-hidden">
-          <Image
-            src={selectedImage}
-            alt={product.name}
-            width={300}
-            height={200}
-            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-          />
+ <Image
+  src={selectedImage || "/placeholder.png"}
+  alt={product?.name || "Product"}
+  width={300}
+  height={200}
+  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+/>
+
 
           {/* Thumbnail Images */}
           {product.images && product.images.length > 1 && (
@@ -62,7 +63,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                   }}
                   className="w-6 h-6 rounded border border-gray-200 overflow-hidden"
                 >
-                  <Image src={img} alt={`thumb-${i}`} width={24} height={24} />
+                 <Image
+  src={img || "/placeholder.png"}
+  alt={`thumb-${i}`}
+  width={24}
+  height={24}
+/>
+
                 </button>
               ))}
             </div>
@@ -211,13 +218,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
       <div className="px-5 pb-5">
         <motion.button
           onClick={handleAddToCart}
-          disabled={!product.inStock}
+          disabled={!product.stockCount}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="w-full bg-primary text-white py-3 rounded-full font-bold hover:bg-primary/90 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
         >
           <ShoppingCart className="h-4 w-4" />
-          <span>{product.inStock ? "Add to Cart" : "Out of Stock"}</span>
+          <span>{product.stockCount ? "Add to Cart" : "Out of Stock"}</span>
         </motion.button>
       </div>
     </motion.div>

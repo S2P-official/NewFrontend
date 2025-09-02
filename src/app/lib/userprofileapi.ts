@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface User {
   id: string;
   firstName:string;
@@ -7,6 +9,13 @@ export interface User {
 }
 
 export interface Order {
+  customerId: ReactNode;
+  email: ReactNode;
+  orderDate: ReactNode;
+  items: boolean;
+  totalAmount: any;
+  addressId: string;
+  customerName: ReactNode;
   id: string;
   date: string;
   status: string;
@@ -14,6 +23,16 @@ export interface Order {
 }
 
 export interface Address {
+  split(arg0: string): unknown;
+
+  phone: string;
+  alternatePhone: string;
+  locality: string;
+  state: string;
+  pincode: string;
+  landmark: any;
+  name: string;
+  addressType: string;
   id: string;
   type: 'shipping' | 'billing';
   street: string;
@@ -42,7 +61,7 @@ export async function fetchUser(userId: string): Promise<User> {
 export async function fetchOrders(userId: string): Promise<Order[]> {
   if (!userId) throw new Error('User ID is required to fetch orders');
 
-  const response = await fetch(`http://localhost:8080/api/customers/${userId}`);
+  const response = await fetch(`http://localhost:8080/order/${userId}`);
   return checkResponse(response);
 }
 
@@ -51,8 +70,14 @@ export async function fetchAddresses(userId: string): Promise<Address[]> {
   if (!userId) throw new Error('User ID is required to fetch addresses');
 
   const response = await fetch(`http://localhost:8080/api/customers/${userId}`);
-  return checkResponse(response);
+  const userData = await checkResponse(response);
+
+  // log full response
+  const addresses = userData.addresses || [];             // extract addresses array
+  console.log("Extracted addresses:", addresses);        // log extracted addresses
+  return addresses;
 }
+
 
 // Update user
 export async function updateUser(userId: string, data: Partial<User>): Promise<User> {

@@ -28,7 +28,7 @@ const CartPage: React.FC = () => {
       return;
     }
     if (coupon.minOrder && totalPrice < coupon.minOrder) {
-      setCouponError(`Minimum order of $${coupon.minOrder} required`);
+      setCouponError(`Minimum order of ₹${coupon.minOrder} required`);
       return;
     }
     setAppliedCoupon(coupon);
@@ -134,7 +134,7 @@ const CartPage: React.FC = () => {
                             {selectedColor && `Color: ${selectedColor}`}
                           </p>
                           <p className="text-lg font-bold text-primary">
-                            ${product.price}
+                            ₹{product.price}
                           </p>
                         </div>
 
@@ -228,7 +228,7 @@ const CartPage: React.FC = () => {
                     <p className="text-sm text-gray-600 mt-1">
                       {appliedCoupon.type === 'percentage'
                         ? `${appliedCoupon.discount}% discount`
-                        : `$${appliedCoupon.discount} off`}
+                        : `₹${appliedCoupon.discount} off`}
                     </p>
                   </div>
                 )}
@@ -238,12 +238,12 @@ const CartPage: React.FC = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-bold">${totalPrice.toFixed(2)}</span>
+                  <span className="font-bold">₹{totalPrice.toFixed(2)}</span>
                 </div>
                 {appliedCoupon && (
                   <div className="flex justify-between text-accent2">
                     <span>Discount</span>
-                    <span className="font-bold">-${discount.toFixed(2)}</span>
+                    <span className="font-bold">-₹{discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
@@ -254,7 +254,7 @@ const CartPage: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-lg font-bold text-gray-800">Total</span>
                     <span className="text-2xl font-bold text-primary">
-                      ${finalTotal.toFixed(2)}
+                      ₹{finalTotal.toFixed(2)}
                     </span>
                   </div>
                 </div>

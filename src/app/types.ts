@@ -23,13 +23,44 @@ export interface Product {
   isOnSale?: boolean;
   colors?: string[];
   features?: string[];
-}
 
+
+    ageGroup:number;
+    facebook:string;
+    amazon:string;
+    meesho:string;
+    youtube:string;
+    mrp:number;
+    tax:number;
+    aboutItem1:string;
+    aboutItem2:string;
+    aboutItem3:string;
+    aboutItem4:string;
+    aboutItem5:string;
+    brand:string;
+    toyFigureType:string;
+    characteroftoy:string;
+    modelName:string;
+    modelNumber:string;
+    manufacturer:string;
+    theme:string;
+    colour:string;
+    occasion:string;
+    material:string;
+    additionalFeatures:string;
+    status:string;
+    areBatteriesRequired:string
+
+}
 export interface CartItem {
+  id: string; // or number, depending on your backend
+  name: string;
+  price: number;
   product: Product;
   quantity: number;
   selectedColor?: string;
 }
+
 
 export interface User {
   id: string;

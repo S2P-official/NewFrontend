@@ -39,7 +39,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   const clearFilters = () => {
     onFiltersChange({
       category: 'all',
-      priceRange: [0, 500],
+      priceRange: [0, Infinity],
       minRating: 0,
       sortBy: 'featured'
     });
@@ -63,7 +63,11 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          {isOpen ? <X className="h-5 w-5 text-gray-600" /> : <Filter className="h-5 w-5 text-gray-600" />}
+          {isOpen ? (
+            <X className="h-5 w-5 text-gray-600" />
+          ) : (
+            <Filter className="h-5 w-5 text-gray-600" />
+          )}
         </motion.div>
       </motion.button>
 
@@ -71,12 +75,12 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, height: 0 }}
-          animate={{ 
-            opacity: isOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024) ? 1 : 0, 
-            height: isOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024) ? 'auto' : 0 
+          animate={{
+            opacity: isOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024) ? 1 : 0,
+            height: isOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024) ? 'auto' : 0
           }}
           exit={{ opacity: 0, height: 0 }}
-          className={`bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden ₹{
+          className={`bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden ${
             isOpen ? 'block' : 'hidden lg:block'
           }`}
         >
@@ -103,8 +107,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   { value: 'toys', label: 'Kids Toys', emoji: '🧸' },
                   { value: 'appliances', label: 'Home Appliances', emoji: '🏠' }
                 ].map((category) => (
-                  <motion.label 
-                    key={category.value} 
+                  <motion.label
+                    key={category.value}
                     className="flex items-center cursor-pointer group"
                     whileHover={{ x: 5 }}
                   >
@@ -129,24 +133,24 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
               <h4 className="font-bold text-gray-800 mb-4 text-lg">Price Range</h4>
               <div className="space-y-3">
                 {[
+                  [0, Infinity, 'All Prices', '🛒'],
                   [0, 50, '₹0 - ₹50', '💰'],
                   [50, 100, '₹50 - ₹100', '💵'],
                   [100, 200, '₹100 - ₹200', '💳'],
                   [200, 500, '₹200+', '💎']
                 ].map(([min, max, label, emoji]) => (
-                  <motion.label 
-                    key={`₹{min}-₹{max}`} 
+                  <motion.label
+                    key={`${min}-${max}`}
                     className="flex items-center cursor-pointer group"
                     whileHover={{ x: 5 }}
                   >
-                <input
-  type="radio"
-  name="priceRange"
-  checked={filters.priceRange[0] === Number(min) && filters.priceRange[1] === Number(max)}
-  onChange={() => handlePriceRangeChange(Number(min), Number(max))}
-  className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded-full"
-/>
-
+                    <input
+                      type="radio"
+                      name="priceRange"
+                      checked={filters.priceRange[0] === min && filters.priceRange[1] === max}
+                      onChange={() => handlePriceRangeChange(Number(min), Number(max))}
+                      className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded-full"
+                    />
                     <span className="ml-3 text-gray-700 font-medium group-hover:text-primary transition-colors">
                       {emoji} {label}
                     </span>
@@ -160,8 +164,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
               <h4 className="font-bold text-gray-800 mb-4 text-lg">Minimum Rating</h4>
               <div className="space-y-3">
                 {[4, 3, 2, 1, 0].map((rating) => (
-                  <motion.label 
-                    key={rating} 
+                  <motion.label
+                    key={rating}
                     className="flex items-center cursor-pointer group"
                     whileHover={{ x: 5 }}
                   >
@@ -173,7 +177,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                       className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded-full"
                     />
                     <span className="ml-3 text-gray-700 font-medium group-hover:text-primary transition-colors">
-                      {rating === 0 ? '⭐ Any Rating' : `₹{'⭐'.repeat(rating)}+ Stars`}
+                      {rating === 0 ? '⭐ Any Rating' : `${'⭐'.repeat(rating)}+ Stars`}
                     </span>
                   </motion.label>
                 ))}
