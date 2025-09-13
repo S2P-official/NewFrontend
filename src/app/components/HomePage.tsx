@@ -4,10 +4,10 @@ import ProductCard from '@/app/components/ProductCard';
 import ProductFilters from '@/app/components/ProductFilters';
 import { motion } from 'framer-motion';
 import { FilterOptions, Product } from '@/app/types';
-import { AuthProvider } from '@/app/context/AuthContext';
+import ProductDetailPage from './CheckoutCard';
 
 function HomePage() {
-     const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterOptions>({
     category: 'all',
     priceRange: [0, 500],
@@ -15,17 +15,30 @@ function HomePage() {
     sortBy: 'featured'
   });
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // 🔄 Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://localhost:8080/products'); // ✅ Update if needed
+        const res = await fetch('https://fictilecore.com/api/products');
         const data = await res.json();
         console.log(data);
-        setProducts(data);
+
+        // ✅ Ensure we set an array
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else if (Array.isArray(data.products)) {
+          setProducts(data.products);
+        } else {
+          console.warn('Unexpected API response:', data);
+          setProducts([]);
+        }
       } catch (error) {
         console.error('Failed to fetch products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
@@ -33,6 +46,8 @@ function HomePage() {
 
   // 🔍 Filter and sort products
   const filteredProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+
     const filtered = products.filter(product => {
       if (filters.category !== 'all' && product.category !== filters.category) return false;
       if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) return false;
@@ -57,8 +72,17 @@ function HomePage() {
 
     return filtered;
   }, [products, filters]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-700">
+        Loading products...
+      </div>
+    );
+  }
+
   return (
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div 
@@ -97,7 +121,7 @@ function HomePage() {
                   { value: 'all', label: 'All', emoji: '🌟' },
                   { value: 'toys', label: 'Toys', emoji: '🧸' },
                   { value: 'appliances', label: 'Appliances', emoji: '🏠' }
-                ].map((category) => (
+                ].map(category => (
                   <motion.button
                     key={category.value}
                     onClick={() => setFilters(prev => ({ ...prev, category: category.value }))}
@@ -156,9 +180,8 @@ function HomePage() {
           </div>
         </div>
       </div>
-      
-        </div>
-  )
+    </div>
+  );
 }
 
-export default HomePage
+export default HomePage;

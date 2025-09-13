@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -12,21 +11,13 @@ import {
   Users,
   ShoppingCart,
   TrendingUp,
-  Eye,
-  Upload,
-  Save,
   X,
-  Route,
-  Router,
 } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
-
 import { Product } from "@/app/types";
 import Image from "next/image";
 import { getProducts } from "@/app/data/products";
 import { useRouter } from "next/navigation";
-
-import router from "next/router";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: TrendingUp },
@@ -37,63 +28,84 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
-const products = await getProducts();
-
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [products, setProducts] = useState<Product[]>([]);
+  const [tabData, setTabData] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const [tabData, setTabData] = useState<any>(null);
-
-  const handleTabClick = async (tabId: TabId) => {
-    setActiveTab(tabId);
-    try {
-      const res = await fetch(`http://localhost:8080/api/${tabId}`);
-      if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
-      setTabData(data);
-    } catch (err) {
-      console.error(err);
-      setTabData(null);
-    }
-  };
-  const Customer_length = Array.isArray(tabData) ? tabData.length : 0;
-
+  // Fetch products
   useEffect(() => {
-    // Cleanup on unmount
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Fetch tab-specific data
+  useEffect(() => {
+    const fetchTabData = async () => {
+      try {
+        const res = await fetch(`https://fictilecore.com/api/${activeTab}`);
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setTabData(data);
+      } catch (err) {
+        console.error(err);
+        setTabData(null);
+      }
+    };
+    fetchTabData();
+  }, [activeTab]);
+
+  // Fetch orders
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch("https://fictilecore.com/order/getall");
+        if (!res.ok) throw new Error("Failed to fetch orders");
+        const data = await res.json();
+        setOrders(data);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setOrders([]);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  // Cleanup preview images
+  useEffect(() => {
     return () => {
       previewImages.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [previewImages]);
 
-  const [orders, setOrders] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:8080/order/getall") // your backend API
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.error("Error fetching orders:", err));
-  }, []);
-
+  // Redirect if user not admin
   useEffect(() => {
     if (!user) {
-      // Not logged in
       router.push("/signin");
     } else if (user.role !== "admin") {
-      // Logged in but not admin
       router.push("/");
     }
   }, [user, router]);
 
   if (!user || user.role !== "admin") return null;
+
+  const handleTabClick = (tabId: TabId) => setActiveTab(tabId);
 
   const filteredProducts = products.filter(
     (product) =>
@@ -136,9 +148,7 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
-  const handleLogout = () => {
-    logout(); // clear auth context/session
-  };
+  const handleLogout = () => logout();
 
   return (
     <div className="min-h-screen bg-background">

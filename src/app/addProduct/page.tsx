@@ -1,17 +1,12 @@
 "use client";
 
-
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 const AddToyProduct = () => {
-
   const { user } = useAuth();
   const router = useRouter();
- 
-
-
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,38 +15,36 @@ const AddToyProduct = () => {
     price: "",
     quantity: "",
     ageGroup: "",
-    facebook:"",
-    amazon:"",
-    meesho:"",
-    youtube:"",
-    mrp:"",
-    tax:"",
-    aboutItem1:"",
-    aboutItem2:"",
-    aboutItem3:"",
-    aboutItem4:"",
-    aboutItem5:"",
-    brand:"",
-    ToyFigureType:"",
-    character:"",
-    modelName:"",
-    modelNumber:"",
-    manufacturer:"",
-    theme:"",
-    colour:"",
-    occasion:"",
-    material:"",
-    additionalFeatures:"",
-    areBatteriesRequired:"",
+    facebook: "",
+    amazon: "",
+    meesho: "",
+    youtube: "",
+    mrp: "",
+    tax: "",
+    aboutItem1: "",
+    aboutItem2: "",
+    aboutItem3: "",
+    aboutItem4: "",
+    aboutItem5: "",
+    brand: "",
+    ToyFigureType: "",
+    character: "",
+    modelName: "",
+    modelNumber: "",
+    manufacturer: "",
+    theme: "",
+    colour: "",
+    occasion: "",
+    material: "",
+    additionalFeatures: "",
+    areBatteriesRequired: "",
   });
 
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -72,7 +65,7 @@ const AddToyProduct = () => {
     const newPreviews = [...previewImages];
 
     newImages.splice(index, 1);
-    URL.revokeObjectURL(newPreviews[index]); // cleanup
+    URL.revokeObjectURL(newPreviews[index]);
     newPreviews.splice(index, 1);
 
     setImages(newImages);
@@ -80,7 +73,6 @@ const AddToyProduct = () => {
   };
 
   useEffect(() => {
-    // Cleanup on unmount
     return () => {
       previewImages.forEach((url) => URL.revokeObjectURL(url));
     };
@@ -89,12 +81,17 @@ const AddToyProduct = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
     try {
       const data = new FormData();
-      data.append("Inventory", JSON.stringify(formData)); // This matches your backend key
+      data.append("Inventory", JSON.stringify(formData));
       images.forEach((file) => data.append("images", file));
 
-      const response = await fetch("http://localhost:8080/add", {
+      const response = await fetch("https://fictilecore.com/api/add", {
         method: "POST",
         body: data,
       });
@@ -108,34 +105,36 @@ const AddToyProduct = () => {
           price: "",
           quantity: "",
           ageGroup: "",
-           facebook:"",
-    amazon:"",
-    meesho:"",
-    youtube:"",
-    mrp:"",
-    tax:"",
-    aboutItem1:"",
-    aboutItem2:"",
-    aboutItem3:"",
-    aboutItem4:"",
-    aboutItem5:"",
-    brand:"",
-    ToyFigureType:"",
-    character:"",
-    modelName:"",
-    modelNumber:"",
-    manufacturer:"",
-    theme:"",
-    colour:"",
-    occasion:"",
-    material:"",
-    additionalFeatures:"",
-    areBatteriesRequired:"",
+          facebook: "",
+          amazon: "",
+          meesho: "",
+          youtube: "",
+          mrp: "",
+          tax: "",
+          aboutItem1: "",
+          aboutItem2: "",
+          aboutItem3: "",
+          aboutItem4: "",
+          aboutItem5: "",
+          brand: "",
+          ToyFigureType: "",
+          character: "",
+          modelName: "",
+          modelNumber: "",
+          manufacturer: "",
+          theme: "",
+          colour: "",
+          occasion: "",
+          material: "",
+          additionalFeatures: "",
+          areBatteriesRequired: "",
         });
         setImages([]);
         setPreviewImages([]);
       } else {
-        alert("Failed .");
+        const text = await response.text();
+        console.error("Backend error:", text);
+        alert("Failed to submit product.");
       }
     } catch (error) {
       console.error("Error submitting toy product:", error);

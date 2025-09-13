@@ -1,10 +1,6 @@
-export interface User {
-  username: string;
-  role: 'admin' | 'user';
-}
-
-
 export interface Product {
+  discount: string;
+  imagePaths?: string | string[];
   id: string;
   name: string;
   price: number;
@@ -14,7 +10,7 @@ export interface Product {
   rating: number;
   reviews: number;
   image: string;
-  images: string[];
+  images?: string | string[];
   description: string;
   specifications: Record<string, string>;
   inStock: boolean;
@@ -23,6 +19,7 @@ export interface Product {
   isOnSale?: boolean;
   colors?: string[];
   features?: string[];
+  quantity :number;
 
 
     ageGroup:number;
@@ -67,6 +64,7 @@ export interface User {
   name: string;
   email: string;
   isAdmin: boolean;
+  role: 'admin' | 'user';
 }
 
 export interface Order {

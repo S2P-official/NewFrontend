@@ -53,7 +53,7 @@ async function checkResponse(response: Response): Promise<any> {
 export async function fetchUser(userId: string): Promise<User> {
   if (!userId) throw new Error('User ID is required to fetch user data');
 
-  const response = await fetch(`http://localhost:8080/api/customers/${userId}`);
+  const response = await fetch(`https://fictilecore.com/api/customers/${userId}`);
   return checkResponse(response);
 }
 
@@ -61,7 +61,7 @@ export async function fetchUser(userId: string): Promise<User> {
 export async function fetchOrders(userId: string): Promise<Order[]> {
   if (!userId) throw new Error('User ID is required to fetch orders');
 
-  const response = await fetch(`http://localhost:8080/order/${userId}`);
+  const response = await fetch(`https://fictilecore.com/order/${userId}`);
   return checkResponse(response);
 }
 
@@ -69,7 +69,7 @@ export async function fetchOrders(userId: string): Promise<Order[]> {
 export async function fetchAddresses(userId: string): Promise<Address[]> {
   if (!userId) throw new Error('User ID is required to fetch addresses');
 
-  const response = await fetch(`http://localhost:8080/api/customers/${userId}`);
+  const response = await fetch(`https://fictilecore.com/api/customers/${userId}`);
   const userData = await checkResponse(response);
 
   // log full response
@@ -83,7 +83,7 @@ export async function fetchAddresses(userId: string): Promise<Address[]> {
 export async function updateUser(userId: string, data: Partial<User>): Promise<User> {
   if (!userId) throw new Error('User ID is required to update user data');
 
-  const response = await fetch(`http://localhost:8080/api/customers/${userId}`, {
+  const response = await fetch(`https://fictilecore.com/api/customers/${userId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

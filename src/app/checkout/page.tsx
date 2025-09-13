@@ -127,7 +127,7 @@ const CheckoutPage: React.FC = () => {
 
     console.log("Final Payload:", payload);
 
-    const response = await fetch("http://localhost:8080/order/save", {
+    const response = await fetch("https://fictilecore.com/order/save", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

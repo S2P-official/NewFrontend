@@ -23,7 +23,7 @@ export default function AccountInfo({ user }: AccountInfoProps) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetch(`https://fcilecore.com:8443/api/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstname,lastname,email, phone }),

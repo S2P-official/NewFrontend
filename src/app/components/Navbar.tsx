@@ -17,17 +17,21 @@ const Navbar: React.FC = () => {
   const pathname = usePathname();
 
   const isActive = (path: string) => pathname === path;
+  
+const handleAdminClick = () => {
+  console.log("Navbar.handleAdminClick — user:", user);
+  if (!user) {
+    console.log("→ redirect to /signin");
+    router.push("/signin");
+  } else if (user.role === "admin") {
+    console.log("→ redirect to /admin");
+    router.push("/admin");
+  } else {
+    console.log("→ redirect to /profile");
+    router.push("/profile");
+  }
+};
 
-  const handleAdminClick = () => {
-    console.log("User:", user?.role);
-    if (!user) {
-      router.push("/signin");
-    } else if (user.role === "admin") {
-      router.push("/admin");
-    } else {
-      router.push("/profile");
-    }
-  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-lg">

@@ -52,7 +52,7 @@ const [loading, setLoading] = useState(true);
   }, []);
 
   const login = async (identifier: string, password: string) => {
-    const response = await fetch('http://localhost:8080/login', {
+    const response = await fetch('https://fictilecore.com/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: identifier, password }),
@@ -85,7 +85,7 @@ const [loading, setLoading] = useState(true);
     password: string,
     role: Role = 'user'
   ) => {
-    const response = await fetch('http://localhost:8080/api/customers/create', {
+    const response = await fetch('https://fictilecore.com/api/customers/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ firstName, lastName, email, phoneNumber, password, role }),

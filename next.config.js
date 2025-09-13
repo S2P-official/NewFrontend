@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['example.com', 'localhost', '143.244.142.60'], // add all domains here
+    domains: ['fictilecore.com', 'localhost', '143.244.142.60'], // add all domains here
   },
 };
 

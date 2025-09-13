@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { Minus, Plus, Trash2 } from "lucide-react"; 
+
 import { useRouter } from "next/navigation";
 import {
   User,
@@ -96,32 +100,72 @@ const ProfilePage: React.FC = () => {
       </section>
 
       {/* Orders */}
-      <section>
-        <h3 className="text-xl font-semibold mb-2">Orders</h3>
-        {orders.length > 0 ? (
-          <ul>
-            {orders.map((order, index) => (
-              <li key={index} className="p-4 border rounded mb-2">
-                <p>Order Date: {order.orderDate}</p>
-                {Array.isArray(order.items) && order.items.length > 0 ? (
-                  <ul className="list-disc list-inside ml-4">
-                    {order.items.map((item, idx) => (
-                      <li key={idx}>
-                        {item.productName} (x{item.quantity})
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No items</p>
-                )}
-                <p>Total Amount: ${order.totalAmount.toFixed(2)}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No orders found.</p>
-        )}
-      </section>
+
+
+<section>
+  <h3 className="text-xl font-semibold mb-4">Orders</h3>
+  {orders.length > 0 ? (
+    <div className="space-y-8">
+      {orders.map((order, index) => (
+        <div key={index} className="p-6 bg-gray-50 rounded-2xl shadow">
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-gray-700">
+              <span className="font-semibold">Order Date:</span> {order.orderDate}
+            </p>
+            <p className="text-gray-800 font-bold">
+              Total: ₹{order.totalAmount?.toFixed(2)}
+            </p>
+          </div>
+
+          {Array.isArray(order.items) && order.items.length > 0 ? (
+            <div className="space-y-4">
+              <AnimatePresence>
+                {order.items.map((item, idx) => {
+                  // build image URL if your backend provides product image paths
+                  const imageUrl = item.imageUrl || "/placeholder.png";
+
+                  return (
+                    <motion.div
+                      key={`${order.id}-${idx}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      className="flex items-center space-x-4 p-4 border border-gray-200 rounded-2xl hover:shadow-md transition-all"
+                    >
+                      <div className="relative w-20 h-20 rounded-xl overflow-hidden">
+                        <Image
+                          src={imageUrl}
+                          alt={item.productName}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-800 mb-1">
+                          {item.productName}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-2">
+                          Quantity: {item.quantity}
+                        </p>
+                        {/* you can add color or other metadata here */}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <p className="text-gray-500">No items in this order</p>
+          )}
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500">No orders found.</p>
+  )}
+</section>
+
 
       {/* Addresses */}
       <section>

@@ -8,7 +8,7 @@ export interface Product {
   rating: number;
   reviews: number;
   image: string;
-  images: string[];
+  images?: string | string[];
   description: string;
   specifications: Record<string, string>;
   inStock: boolean;

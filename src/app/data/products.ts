@@ -1,19 +1,19 @@
 import { Product } from '@/app/types';
 
-const API_URL = 'http://localhost:8080/products';
+const API_URL = 'https://fictilecore.com/api/products';
+
+let cachedProducts: Product[] | null = null;
 
 /**
  * Fetch all products from backend
  */
 export async function getProducts(): Promise<Product[]> {
+  if (cachedProducts) return cachedProducts;
   try {
     const res = await fetch(API_URL, { cache: 'no-store' });
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
-    }
-
+    if (!res.ok) throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
     const data: Product[] = await res.json();
+    cachedProducts = data;
     return data;
   } catch (error) {
     console.error('Error fetching products:', error);

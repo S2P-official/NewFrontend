@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
-import { motion } from "framer-motion";
-import { Product } from "@/app/types";
-import { useCart } from "@/app/context/CartContext";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Product } from '@/app/types';
+import { useCart } from '@/app/context/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,21 +14,35 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+  const { addToCart } = useCart();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [quickViewOpen, setQuickViewOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(product.image);
-  const { addToCart } = useCart();
+
+  // --- Handle image paths safely ---
+  const imagesArray: string[] = !product.imagePaths
+    ? []
+    : Array.isArray(product.imagePaths)
+    ? product.imagePaths
+    : String(product.imagePaths).includes(',')
+    ? String(product.imagePaths).split(',').map((p) => p.trim())
+    : [String(product.imagePaths)];
+
+  const [selectedImage, setSelectedImage] = useState<string>(
+    imagesArray.length > 0 ? imagesArray[0] : '/placeholder.png'
+  );
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.stopPropagation(); // Prevent card click
     addToCart(product);
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.stopPropagation(); // Prevent card click
     setIsWishlisted(!isWishlisted);
   };
+
+  const buildImageURL = (path: string) =>
+    encodeURI(path.startsWith('/') ? `https://fictilecore.com${path}` : path);
 
   return (
     <motion.div
@@ -38,38 +52,41 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
       whileHover={{ y: -8 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+      className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer"
     >
-      <Link href={`/product/${product.id}`}>
+      <Link href={`/product/${product.id}`} className="block">
         <div className="relative overflow-hidden">
- <Image
-  src={selectedImage || "/placeholder.png"}
-  alt={product?.name || "Product"}
-  width={300}
-  height={200}
-  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-/>
-
+          {/* Main Image */}
+          <Image
+            src={buildImageURL(selectedImage)}
+            alt={product.name || 'Product'}
+            width={300}
+            height={200}
+            priority
+            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+          />
 
           {/* Thumbnail Images */}
-          {product.images && product.images.length > 1 && (
+          {imagesArray.length > 1 && (
             <div className="absolute bottom-16 left-3 flex space-x-1">
-              {product.images.slice(0, 4).map((img, i) => (
+              {imagesArray.slice(0, 4).map((img, i) => (
                 <button
                   key={i}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     setSelectedImage(img);
                   }}
-                  className="w-6 h-6 rounded border border-gray-200 overflow-hidden"
+                  className={`w-6 h-6 rounded border border-gray-200 overflow-hidden ${
+                    selectedImage === img ? 'border-primary' : ''
+                  }`}
                 >
-                 <Image
-  src={img || "/placeholder.png"}
-  alt={`thumb-${i}`}
-  width={24}
-  height={24}
-/>
-
+                  <Image
+                    src={buildImageURL(img)}
+                    alt={`thumb-${i}`}
+                    width={24}
+                    height={24}
+                  />
                 </button>
               ))}
             </div>
@@ -107,7 +124,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
           >
             <Heart
               className={`h-5 w-5 transition-colors ${
-                isWishlisted ? "fill-primary text-primary" : "text-gray-600"
+                isWishlisted ? 'fill-primary text-primary' : 'text-gray-600'
               }`}
             />
           </motion.button>
@@ -118,23 +135,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
             animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
             className="absolute bottom-3 left-3 right-3"
           >
-            <button
-              className="w-full bg-white/90 backdrop-blur-sm text-gray-800 py-2 rounded-full font-medium hover:bg-white transition-all flex items-center justify-center space-x-2"
-              onClick={(e) => {
-                e.preventDefault();
-                setQuickViewOpen(true);
-              }}
-            >
+            <button className="w-full bg-white/90 backdrop-blur-sm text-gray-800 py-2 rounded-full font-medium hover:bg-white transition-all flex items-center justify-center space-x-2">
               <Eye className="h-4 w-4" />
               <span>Quick View</span>
             </button>
           </motion.div>
         </div>
 
+        {/* Product Info */}
         <div className="p-5">
           <div className="mb-3">
             <span className="text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full">
-              {product.subcategory}
+              {product.subcategory || 'General'}
             </span>
           </div>
 
@@ -148,23 +160,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                 <Star
                   key={i}
                   className={`h-4 w-4 ${
-                    i < Math.floor(product.rating)
-                      ? "fill-accent1 text-accent1"
-                      : "text-gray-300"
+                    i < Math.floor(product.rating || 0)
+                      ? 'fill-accent1 text-accent1'
+                      : 'text-gray-300'
                   }`}
                 />
               ))}
             </div>
             <span className="text-sm text-gray-600 ml-2 font-medium">
-              {product.rating} ({product.reviews})
+              {product.rating || 0} ({product.reviews || 0})
             </span>
           </div>
 
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-primary">
-                ₹{product.price}
-              </span>
+              <span className="text-xl font-bold text-primary">₹{product.price}</span>
               {product.originalPrice && (
                 <span className="text-sm text-gray-500 line-through">
                   ₹{product.originalPrice}
@@ -174,43 +184,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-accent2 rounded-full"></div>
               <span className="text-xs text-gray-600 font-medium">
-                {product.stockCount} left
+                {product.stockCount || 0} left
               </span>
             </div>
           </div>
-
-          {/* Color Options */}
-          {product.colors && product.colors.length > 0 && (
-            <div className="mb-4">
-              <div className="flex space-x-2">
-                {product.colors.slice(0, 3).map((color, i) => (
-                  <div
-                    key={color}
-                    className={`w-6 h-6 rounded-full border-2 border-gray-200 ${
-                      color === "Black"
-                        ? "bg-black"
-                        : color === "White"
-                        ? "bg-white"
-                        : color === "Red"
-                        ? "bg-red-500"
-                        : color === "Blue"
-                        ? "bg-blue-500"
-                        : color === "Green"
-                        ? "bg-green-500"
-                        : color === "Pink"
-                        ? "bg-pink-500"
-                        : "bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500"
-                    }`}
-                  />
-                ))}
-                {product.colors.length > 3 && (
-                  <span className="text-xs text-gray-500 flex items-center">
-                    +{product.colors.length - 3}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </Link>
 
@@ -224,7 +201,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
           className="w-full bg-primary text-white py-3 rounded-full font-bold hover:bg-primary/90 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
         >
           <ShoppingCart className="h-4 w-4" />
-          <span>{product.stockCount ? "Add to Cart" : "Out of Stock"}</span>
+          <span>{product.stockCount ? 'Add to Cart' : 'Out of Stock'}</span>
         </motion.button>
       </div>
     </motion.div>

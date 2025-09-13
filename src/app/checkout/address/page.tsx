@@ -34,7 +34,7 @@ export default function AddressSection() {
   // Fetch address
   useEffect(() => {
     if (user?.id) {
-      fetch(`http://localhost:8080/api/customers/${user.id}`)
+      fetch(`http://fictilecore.com/api/customers/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (data) {
@@ -62,7 +62,7 @@ export default function AddressSection() {
     if (!user?.id) return console.error('User not logged in');
 
     try {
-      const res = await fetch(`http://localhost:8080/api/address/save`, {
+      const res = await fetch(`https://fictilecore.com/api/address/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, customerId: user.id }),

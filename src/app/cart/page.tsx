@@ -48,6 +48,10 @@ const CartPage: React.FC = () => {
 
   const finalTotal = Math.max(0, totalPrice - discount);
 
+  // Build full image URL helper
+  const buildImageURL = (path: string) =>
+    path.startsWith('/') ? `https://fictilecore.com${path}` : path;
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
@@ -62,7 +66,7 @@ const CartPage: React.FC = () => {
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4">Your cart is empty</h1>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              {`Looks like you haven't added any items to your cart yet. Start shopping to fill it up`}
+              Looks like you haven't added any items to your cart yet. Start shopping to fill it up.
             </p>
 
             <Link href="/">
@@ -83,12 +87,11 @@ const CartPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <Link href="/" className="inline-flex items-center space-x-2 text-secondary hover:text-secondary/80 transition-colors mb-4">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-2 text-secondary hover:text-secondary/80 transition-colors mb-4"
+          >
             <ArrowLeft className="h-5 w-5" />
             <span className="font-medium">Continue Shopping</span>
           </Link>
@@ -104,14 +107,24 @@ const CartPage: React.FC = () => {
               <h2 className="text-xl font-bold text-gray-800 mb-6">Cart Items</h2>
               <div className="space-y-6">
                 <AnimatePresence>
-                  {items.map((item) => {
+                  {items.map(item => {
                     const { product, quantity, selectedColor } = item;
-
                     if (!product) return null;
+
+                    // Build image array
+                    const imagesArray = product.imagePaths
+                      ? Array.isArray(product.imagePaths)
+                        ? product.imagePaths
+                        : String(product.imagePaths)
+                            .split(',')
+                            .map(img => img.trim())
+                      : [];
+
+                    const imageUrl = imagesArray[0] ? buildImageURL(imagesArray[0]) : '/placeholder.png';
 
                     return (
                       <motion.div
-                        key={`${product.id}-${selectedColor}`}
+                        key={`${product.id}-${selectedColor || 'default'}`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
@@ -119,7 +132,7 @@ const CartPage: React.FC = () => {
                       >
                         <div className="relative w-20 h-20 rounded-xl overflow-hidden">
                           <Image
-                            src={product.image}
+                            src={imageUrl}
                             alt={product.name}
                             fill
                             className="object-cover"
@@ -127,15 +140,11 @@ const CartPage: React.FC = () => {
                         </div>
 
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-800 mb-1">
-                            {product.name}
-                          </h3>
+                          <h3 className="font-bold text-gray-800 mb-1">{product.name}</h3>
                           <p className="text-sm text-gray-600 mb-2">
                             {selectedColor && `Color: ${selectedColor}`}
                           </p>
-                          <p className="text-lg font-bold text-primary">
-                            ₹{product.price}
-                          </p>
+                          <p className="text-lg font-bold text-primary">₹{product.price}</p>
                         </div>
 
                         <div className="flex items-center space-x-3">
